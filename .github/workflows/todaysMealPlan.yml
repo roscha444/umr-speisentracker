@@ -24,7 +24,7 @@ jobs:
           URL: "https://studentenwerk-marburg.de/essen-trinken/speisekarte"
           CANTEEN: "340"
           API: ${{ secrets.MENSA_LAHNBERGE }}
-      - name: execute mensa.py fpr Cafeteria Lahnberge
+      - name: execute mensa.py for Cafeteria Lahnberge
         run: |
           python mensa.py
         env:
