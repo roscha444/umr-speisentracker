@@ -14,21 +14,24 @@ site = requests.get(url)
 parsedContent = BeautifulSoup(site.content, "html.parser")
 results = parsedContent.find_all("tr", attrs={"data-canteen":canteen})
 
-todaysFood = []
+todaysMeals = []
 
 for entry in results:
-    food = entry.findAll("span")
-    foodName = food[0].text.strip()
-    if(food[2].text.strip() == "vegan"):
-        foodName += " **vegan** "
-        foodPrice = food[4].text.strip()
-    else:
-        foodPrice = food[2].text.strip()
-    foodDate = datetime.strptime(entry.attrs["data-date"], "%Y-%m-%d").date()
-    if(today == foodDate):
-        todaysFood.append({"name":foodName, "price": foodPrice})
+    mealDetails = entry.findAll("span")
+    if(len(mealDetails) > 2):
+        mealName = mealDetails[0].text.strip()
+        if("€" in mealDetails[2].text.strip()):
+            mealPrice = mealDetails[2].text.strip()
+        else:
+            mealName += "  **" + mealDetails[3].text.strip() + "**"
+            mealPrice = mealDetails[4].text.strip()
+        foodDate = datetime.strptime(entry.attrs["data-date"], "%Y-%m-%d").date()
+        if(today < foodDate):
+            mealName = re.sub(" \([^()]*\)( ){0,1}", "", mealName)
+            meal = mealName + " " + mealPrice + "\n\n"
+            todaysMeals.append(meal)
 
-if(len(todaysFood) > 0):
+if(len(todaysMeals) > 0):
     discordMessage = "**"
     if(os.environ.get("CANTEEN")=="340"):
         discordMessage += "Mensa Lahnberge"
@@ -36,10 +39,14 @@ if(len(todaysFood) > 0):
         discordMessage += "Mo's Diner"
     elif(os.environ.get("CANTEEN")=="490"):
         discordMessage += "Cafeteria Lahnberge"
+    elif(os.environ.get("CANTEEN")=="330"):
+        discordMessage += "Mensa Erlenring"
+    elif(os.environ.get("CANTEEN")=="460"):
+        discordMessage += "Bistro"
+    
     discordMessage += " am " + today.strftime("%d.%m.%Y") + "**\n\n"
 
-    for entry in todaysFood:
-        name = re.sub(r"\([^()]*\)", "", entry["name"])
-        discordMessage += name + " " + entry["price"] + "\n\n"
+    for entry in todaysMeals:
+        discordMessage += entry
 
     requests.post(os.environ.get("API"), json={"content" : discordMessage})
