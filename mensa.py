@@ -12,15 +12,21 @@ today = datetime.now().date()
 url = os.environ.get("URL")
 site = requests.get(url)
 parsedContent = BeautifulSoup(site.content, "html.parser")
-foodResults = parsedContent.find_all("tr", attrs={"data-canteen":canteen})
+results = parsedContent.find_all("tr", attrs={"data-canteen":canteen})
 
 todaysFood = []
 
-for food in foodResults:
-    foodName = food.find("span").text.strip()
-    foodDate = datetime.strptime(food.attrs["data-date"], "%Y-%m-%d").date()
+for entry in results:
+    food = entry.findAll("span")
+    foodName = food[0].text.strip()
+    if(food[2].text.strip() == "vegan"):
+        foodName += " **vegan** "
+        foodPrice = food[4].text.strip()
+    else:
+        foodPrice = food[2].text.strip()
+    foodDate = datetime.strptime(entry.attrs["data-date"], "%Y-%m-%d").date()
     if(today == foodDate):
-        todaysFood.append(foodName)
+        todaysFood.append({"name":foodName, "price": foodPrice})
 
 if(len(todaysFood) > 0):
     discordMessage = "**"
@@ -32,8 +38,8 @@ if(len(todaysFood) > 0):
         discordMessage += "Cafeteria Lahnberge"
     discordMessage += " am " + today.strftime("%d.%m.%Y") + "**\n\n"
 
-    for food in todaysFood:
-        food = re.sub(r"\([^()]*\)", "", food)
-        discordMessage += food + "\n\n"
+    for entry in todaysFood:
+        name = re.sub(r"\([^()]*\)", "", entry["name"])
+        discordMessage += name + " " + entry["price"] + "\n\n"
 
     requests.post(os.environ.get("API"), json={"content" : discordMessage})
