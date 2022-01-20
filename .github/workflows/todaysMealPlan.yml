@@ -1,0 +1,40 @@
+name: Get todays meal plan
+on:
+  schedule:
+    - cron: "50 9 * * 1-5"
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - name: execute mensa.py for Mensa Lahnberge
+        run: |
+          python mensa.py
+        env:
+          URL: "https://studentenwerk-marburg.de/essen-trinken/speisekarte"
+          CANTEEN: "340"
+          API: ${{ secrets.MENSA_LAHNBERGE }}
+      - name: execute mensa.py for Cafeteria Lahnberge
+        run: |
+          python mensa.py
+        env:
+          URL: "https://studentenwerk-marburg.de/essen-trinken/speisekarte"
+          CANTEEN: "490"
+          API: ${{ secrets.CAFETERIA_LAHNBERGE }}
+      - name: execute mensa.py for Mos Diner
+        run: |
+          python mensa.py
+        env:
+          URL: "https://studentenwerk-marburg.de/essen-trinken/speisekarte"
+          CANTEEN: "420"
+          API: ${{ secrets.MOS_DINER }}
