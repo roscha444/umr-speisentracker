@@ -26,7 +26,7 @@ for entry in results:
             mealName += "  **" + mealDetails[3].text.strip() + "**"
             mealPrice = mealDetails[4].text.strip()
         foodDate = datetime.strptime(entry.attrs["data-date"], "%Y-%m-%d").date()
-        if(today < foodDate):
+        if(today == foodDate):
             mealName = re.sub(" \([^()]*\)( ){0,1}", "", mealName)
             meal = mealName + " " + mealPrice + "\n\n"
             todaysMeals.append(meal)
