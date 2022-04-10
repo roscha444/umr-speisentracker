@@ -1,7 +1,7 @@
 name: Get todays meal plan
 on:
   schedule:
-    - cron: "29 7 * * 1-5"
+    - cron: "29 6 * * 1-5"
     
   workflow_dispatch:
 
