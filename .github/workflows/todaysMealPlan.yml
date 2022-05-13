@@ -38,3 +38,17 @@ jobs:
           URL: "https://studentenwerk-marburg.de/essen-trinken/speisekarte"
           CANTEEN: "420"
           API: ${{ secrets.MOS_DINER }}
+      - name: execute mensa.py for Erlenring
+        run: |
+          python mensa.py
+        env:
+          URL: "https://studentenwerk-marburg.de/essen-trinken/speisekarte"
+          CANTEEN: "330"
+          API: ${{ secrets.ERLENRING }}
+      - name: execute mensa.py for Bistro
+        run: |
+          python mensa.py
+        env:
+          URL: "https://studentenwerk-marburg.de/essen-trinken/speisekarte"
+          CANTEEN: "460"
+          API: ${{ secrets.BISTRO }}
